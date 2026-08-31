@@ -1,19 +1,24 @@
 // ═══════════════════════════════════════════════════════════════════
 // Savoy FOH — Firebase Auth & Access Logging
 // ═══════════════════════════════════════════════════════════════════
-// Firebase config — replace with your actual Savoy project credentials
-// from Firebase Console > Project Settings > Your apps > Config.
-// NOTE: This currently reuses the Petrus project config. Create a new
-// Firebase project for Savoy and paste its config here to keep the
-// data separate from Petrus.
+// SAVOY has its OWN Firebase project, separate from Petrus.
+//
+// TODO — Paste the Savoy Firebase web config below:
+//   1. https://console.firebase.google.com  → create project "savoy-foh"
+//   2. Build > Authentication > enable Email/Password
+//   3. Build > Firestore Database > create database
+//   4. Project Settings (gear) > Your apps > Web app (</>) > copy config
+//   5. Replace every REPLACE_ME value below with the copied values.
+//
+// Until this is done with a REAL Savoy project, login will NOT work.
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAZSXeztJmLCTlaTYYPqjhpAEJTNaWg6so",
-  authDomain: "petrus-foh.firebaseapp.com",
-  projectId: "petrus-foh",
-  storageBucket: "petrus-foh.firebasestorage.app",
-  messagingSenderId: "757004948096",
-  appId: "1:757004948096:web:7172cd15aaf80b35410c65"
+  apiKey: "REPLACE_ME",
+  authDomain: "savoy-foh.firebaseapp.com",
+  projectId: "savoy-foh",
+  storageBucket: "savoy-foh.firebasestorage.app",
+  messagingSenderId: "REPLACE_ME",
+  appId: "REPLACE_ME"
 };
 
 // Initialize Firebase

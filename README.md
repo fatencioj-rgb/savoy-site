@@ -34,11 +34,23 @@ inventory quantity to specific products, per location.
 Par levels are stored per section in the Firestore collection
 `savoy_par_levels` (documents `par_wine` and `par_bar`).
 
-## Firebase
+## Firebase (separate project from Petrus)
 
-`auth.js` currently reuses the Petrus Firebase project config. To keep Savoy's
-data fully separate, create a new Firebase project and paste its config into
-`auth.js`. Users log in with `name@savoy.local` and a personal code.
+Savoy is a different restaurant, so it uses its **own** Firebase project — no
+data is shared with Petrus.
+
+Setup:
+1. Go to https://console.firebase.google.com and create a project, e.g. `savoy-foh`.
+2. **Build > Authentication > Get started > Email/Password > Enable**.
+3. **Build > Firestore Database > Create database**.
+4. **Authentication > Users > Add user** — create logins like
+   `fiorella@savoy.local`, `christian@savoy.local`, `milena@savoy.local`,
+   `guest@savoy.local`. The password is the person's "personal code".
+5. **Project Settings (gear) > Your apps > Web app (</>)** — copy the
+   `firebaseConfig` object and paste it into `auth.js` (replace every
+   `REPLACE_ME`).
+
+Users log in with `name@savoy.local` and a personal code.
 
 Firestore collections used:
 - `savoy_stocktake` — saved stocktakes
