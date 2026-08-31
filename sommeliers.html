@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sommeliers — Savoy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --green:#14304f; --green-dark:#0a1a2e; --gold:#b89650; --gold-light:#d4b87a; --cream:#faf7f1; --pink:#e8eef5; --sans:'Inter',sans-serif; --serif:'Cormorant Garamond',serif; }
+body { font-family:var(--sans); background:var(--cream); color:#2c2c2c; min-height:100vh; }
+.top-bar { background:var(--green-dark); padding:12px 24px; display:flex; align-items:center; justify-content:space-between; }
+.top-bar a { color:var(--gold); text-decoration:none; font-size:12px; letter-spacing:1px; text-transform:uppercase; }
+.top-bar a:hover { color:#fff; }
+.top-bar h2 { font-family:var(--serif); color:#fff; font-size:18px; margin:0; }
+.page { max-width:700px; margin:0 auto; padding:40px 24px; text-align:center; }
+.page h1 { font-family:var(--serif); font-size:34px; color:var(--green); margin-bottom:8px; }
+@keyframes fadeSlideIn { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+.page .sub { font-size:13px; color:#888; letter-spacing:1px; margin-bottom:24px; }
+#greeting { text-align:left;color:var(--green);font-family:var(--serif);font-size:22px;letter-spacing:0;margin-bottom:24px;opacity:0;animation:fadeSlideIn 0.8s ease forwards;animation-delay:0.3s }
+.profiles { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+.profile-card {
+  flex:1; min-width:150px; max-width:220px;
+  background:var(--pink); border:1px solid rgba(20,48,79,0.12); border-radius:8px;
+  padding:24px 16px; text-decoration:none; color:var(--green);
+  transition:all 0.3s ease; text-align:center;
+}
+.profile-card:hover { border-color:var(--green); transform:translateY(-3px); box-shadow:0 6px 24px rgba(20,48,79,0.1); }
+.profile-card h3 { font-family:var(--serif); font-size:18px; color:var(--green); margin-bottom:4px; letter-spacing:0.5px; }
+.profile-card p { font-size:10px; color:#888; line-height:1.3; }
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <a href="index.html">&larr; Back</a>
+  <h2>Savoy</h2>
+  <span></span>
+</div>
+<div class="page">
+  <h1>Sommeliers</h1>
+  <p id="greeting"><span id="greetName"></span></p>
+  <div class="profiles">
+    <a href="somm-stocktake.html" class="profile-card">
+      <h3>Stocktake</h3>
+      <p>Inventory counts &amp; par levels</p>
+    </a>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="auth.js"></script>
+<script>
+auth.onAuthStateChanged((user) => {
+  if (!user) { window.location.href = 'index.html'; }
+  else {
+    logAccess(user, 'page_view', 'sommeliers.html');
+    var name = user.displayName || user.email.split('@')[0].replace(/\./g,' ');
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    document.getElementById('greetName').textContent = 'Hello, ' + name;
+  }
+});
+</script>
+</body>
+</html>

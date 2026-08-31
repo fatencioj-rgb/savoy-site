@@ -1,0 +1,21 @@
+# Sensitive data
+*.csv
+*.env
+*.key
+*.pem
+*.crt
+accounts.json
+firebase-debug.log
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+*.swp
+*.swo
+
+# Kiro local
+.kiro/

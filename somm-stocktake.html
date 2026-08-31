@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stocktake — Savoy Sommeliers</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#14304f;--green-dark:#0a1a2e;--gold:#b89650;--gold-light:#d4b87a;--cream:#faf7f1;--sans:'Inter',sans-serif;--serif:'Cormorant Garamond',serif}
+body{font-family:var(--sans);background:var(--cream);color:#2c2c2c;min-height:100vh}
+.top-bar{background:var(--green-dark);padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.top-bar a{color:var(--gold);text-decoration:none;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.top-bar a:hover{color:#fff}
+.top-bar h2{font-family:var(--serif);color:#fff;font-size:18px;margin:0}
+.page{max-width:1100px;margin:0 auto;padding:24px 16px 80px}
+.page-title{font-family:var(--serif);font-size:28px;color:var(--green);margin-bottom:20px;text-align:center}
+
+.tabs{display:flex;gap:8px;justify-content:center;margin-bottom:24px;flex-wrap:wrap}
+.tab-btn{padding:10px 24px;border:2px solid var(--green);border-radius:6px;background:transparent;color:var(--green);font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
+.tab-btn:hover{background:var(--green);color:#fff}
+.tab-btn.active{background:var(--green);color:#fff}
+
+.controls{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:20px;padding:16px;background:#fff;border:1px solid #dde3ea;border-radius:8px}
+.ctrl-group{display:flex;flex-direction:column;gap:4px}
+.ctrl-group label{font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:#888;font-weight:500}
+.ctrl-group select,.ctrl-group input[type="date"]{padding:8px 12px;border:1px solid #ddd;border-radius:5px;font-family:var(--sans);font-size:13px;outline:none}
+.ctrl-group select:focus,.ctrl-group input[type="date"]:focus{border-color:var(--gold)}
+.upload-area{margin-left:auto;display:flex;align-items:center;gap:8px}
+.upload-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#e8eef5;color:var(--green);border:none;border-radius:5px;font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:background 0.2s}
+.upload-btn:hover{background:#d4dfeb}
+.parlevel-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--gold);color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:background 0.2s}
+.parlevel-btn:hover{background:#a5843f}
+#csvFile{display:none}
+
+.stock-table-wrap{background:#fff;border:1px solid #dde3ea;border-radius:8px;overflow-x:auto;margin-bottom:20px;max-height:70vh;overflow-y:auto}
+.stock-table{width:100%;border-collapse:collapse;min-width:800px}
+.stock-table thead{background:#e8eef5;position:sticky;top:0;z-index:2}
+.stock-table th{padding:10px 10px;color:var(--green);font-size:9px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;text-align:left;white-space:nowrap}
+.stock-table tbody tr{border-bottom:1px solid #eef1f5;transition:background 0.1s}
+.stock-table tbody tr:hover{background:#f7fafd}
+.stock-table td{padding:7px 10px;font-size:11px;vertical-align:middle}
+.stock-table td.name-cell{font-weight:500;max-width:260px}
+.stock-table td.num-cell{text-align:center;color:#666}
+.stock-table .qty-input{width:58px;padding:6px 6px;border:1px solid #ddd;border-radius:4px;font-size:12px;font-family:var(--sans);text-align:center;outline:none;background:#fffef8}
+.stock-table .qty-input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(184,150,80,0.18)}
+/* Par-level filled cell */
+.stock-table .qty-input.par-filled{background:#fff4d6;border-color:var(--gold);font-weight:600;color:#8a6d1f}
+
+.cat-row td{background:#eef2f7;font-size:12px;font-weight:600;color:var(--green);padding:10px 12px}
+
+.total-header{background:var(--green) !important;color:#fff !important}
+.total-cell{text-align:center;font-weight:700;color:var(--green);font-size:12px;background:#eef2f7}
+
+.loc-header-name{margin-bottom:6px;text-align:center;font-size:8px;line-height:1.3;white-space:nowrap}
+.loc-header-lock{margin-bottom:4px;text-align:center}
+
+.disc-check{width:16px;height:16px;accent-color:#c0392b;cursor:pointer}
+.disc-row td{opacity:0.4;text-decoration:line-through}
+.lock-btn{display:inline-block;cursor:pointer;font-size:8px;padding:3px 7px;border-radius:4px;border:1px solid var(--green);color:var(--green);background:transparent;font-family:var(--sans);font-weight:600;text-transform:uppercase;letter-spacing:0.3px;transition:all 0.2s;white-space:nowrap}
+.lock-btn:hover{background:var(--green);color:#fff}
+.lock-btn.is-locked{background:var(--green-dark);color:#fff;border-color:var(--green-dark)}
+.lock-info{font-size:8px;font-weight:400;letter-spacing:0;text-transform:none;color:#999;margin-top:4px}
+.qty-input.locked{background:#f0f0f0;color:#aaa;border-color:#e0e0e0;cursor:not-allowed}
+
+/* Par badge on product name */
+.par-badge{display:inline-block;margin-left:6px;font-size:7px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;background:var(--gold);color:#fff;padding:1px 6px;border-radius:8px;vertical-align:middle}
+
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.action-btn{padding:12px 28px;border:none;border-radius:6px;font-family:var(--sans);font-size:12px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
+.btn-save{background:var(--green);color:#fff}
+.btn-save:hover{background:var(--green-dark)}
+.btn-update{background:var(--green);color:#fff}
+.btn-update:hover{background:var(--green-dark)}
+.btn-export{background:var(--green);color:#fff}
+.btn-export:hover{background:var(--green-dark)}
+.btn-print{background:var(--green);color:#fff}
+.btn-print:hover{background:var(--green-dark)}
+.btn-delete{background:#fff;color:#c0392b;border:1px solid #c0392b}
+.btn-delete:hover{background:#c0392b;color:#fff}
+
+@media print{
+  body{background:#fff !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .top-bar,.tabs,.controls,.upload-area,.actions,.status-msg,.info-bar,.search-bar,.saved-doc,.modal-overlay{display:none !important}
+  .page{max-width:100%;padding:0;margin:0}
+  .page-title{font-size:20px;margin-bottom:10px}
+  .stock-table-wrap{border:none;overflow:visible;max-height:none}
+  .stock-table{min-width:auto}
+  .stock-table thead{background:#e8eef5 !important}
+  .stock-table th{font-size:8px;padding:6px 5px}
+  .stock-table td{font-size:10px;padding:5px 5px}
+  .stock-table tbody tr{border-bottom:1px solid #ccc}
+  .stock-table .qty-input{border:1px solid #ccc;width:45px;padding:3px;font-size:10px}
+  .cat-row td{font-size:10px;padding:6px 8px}
+  .total-cell{font-size:10px}
+}
+
+.empty-state{text-align:center;padding:60px 20px;color:#aaa}
+.empty-state h3{font-family:var(--serif);font-size:22px;color:#999;margin-bottom:8px}
+.empty-state p{font-size:13px}
+
+.status-msg{position:fixed;bottom:20px;right:20px;background:var(--green);color:var(--cream);padding:10px 18px;border-radius:6px;font-size:12px;opacity:0;transition:opacity 0.3s;z-index:9999}
+.status-msg.show{opacity:1}
+
+.info-bar{font-size:11px;color:#888;margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap}
+.info-bar span{background:#fff;padding:4px 10px;border-radius:4px;border:1px solid #dde3ea}
+
+.search-bar{margin-bottom:16px;position:sticky;top:0;z-index:3;background:var(--cream);padding:8px 0}
+.search-bar input{width:calc(100% - 50px);padding:10px 14px;border:1px solid #dde3ea;border-radius:6px;font-family:var(--sans);font-size:13px;outline:none;background:#fff;display:inline-block}
+.search-bar input:focus{border-color:var(--gold);box-shadow:0 0 0 2px rgba(184,150,80,0.12)}
+.search-bar .done-btn{display:inline-block;width:44px;padding:10px 0;text-align:center;font-size:10px;font-weight:600;color:var(--green);cursor:pointer;vertical-align:top}
+
+.saved-doc{background:#fff;border:1px solid #dde3ea;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#555;display:flex;align-items:center;gap:8px}
+.saved-doc-icon{color:#27ae60;font-size:10px}
+
+/* Par Levels modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:10000;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.modal-overlay.active{opacity:1;visibility:visible}
+.modal-box{background:#fff;border-radius:12px;width:92%;max-width:640px;max-height:86vh;display:flex;flex-direction:column;box-shadow:0 12px 60px rgba(0,0,0,0.3);overflow:hidden}
+.modal-head{background:var(--green-dark);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.modal-head h3{font-family:var(--serif);font-size:20px;margin:0}
+.modal-head .x{cursor:pointer;color:var(--gold);font-size:20px}
+.modal-body{padding:16px 20px;overflow-y:auto}
+.modal-note{font-size:11px;color:#888;margin-bottom:14px;line-height:1.5}
+.par-search{width:100%;padding:9px 12px;border:1px solid #dde3ea;border-radius:6px;font-size:13px;font-family:var(--sans);outline:none;margin-bottom:12px}
+.par-search:focus{border-color:var(--gold)}
+.par-item{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid #f0f0f0}
+.par-item .p-name{flex:1;font-size:12px}
+.par-item .p-name small{display:block;color:#aaa;font-size:9px}
+.par-item .p-qty{width:70px;padding:6px 8px;border:1px solid #ddd;border-radius:5px;font-size:12px;text-align:center;font-family:var(--sans);outline:none}
+.par-item .p-qty:focus{border-color:var(--gold)}
+.par-item.has-par{background:#fff9ea}
+.par-loc{font-size:9px;color:#888}
+.modal-foot{padding:14px 20px;border-top:1px solid #eee;display:flex;gap:10px;justify-content:flex-end;background:#fafafa}
+.par-loc-select{padding:8px 10px;border:1px solid #ddd;border-radius:5px;font-size:12px;font-family:var(--sans);margin-bottom:12px}
+
+@media(max-width:700px){
+  .controls{flex-direction:column;align-items:stretch}
+  .upload-area{margin-left:0;justify-content:center;flex-wrap:wrap}
+  .tab-btn{padding:8px 14px;font-size:10px}
+}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <a href="sommeliers.html">&larr; Back</a>
+  <h2>Savoy</h2>
+  <span></span>
+</div>
+
+<div class="page">
+  <h1 class="page-title">Stocktake</h1>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tabWine" onclick="switchTab('wine')">Wine</button>
+    <button class="tab-btn" id="tabBar" onclick="switchTab('bar')">Beverage</button>
+  </div>
+
+  <div class="controls">
+    <div class="ctrl-group">
+      <label>Month</label>
+      <select id="monthSelect"></select>
+    </div>
+    <div class="ctrl-group">
+      <label>Date</label>
+      <input type="date" id="dateInput">
+    </div>
+    <div class="upload-area">
+      <button class="parlevel-btn" onclick="openParModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Par Levels
+      </button>
+      <input type="file" id="csvFile" accept=".csv">
+      <button class="upload-btn" onclick="document.getElementById('csvFile').click()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Upload CSV
+      </button>
+    </div>
+  </div>
+
+  <div class="info-bar" id="infoBar" style="display:none">
+    <span id="infoCount"></span>
+    <span id="infoMeta"></span>
+    <span id="infoPar" style="display:none"></span>
+  </div>
+
+  <div class="saved-doc" id="savedDoc" style="display:none">
+    <span class="saved-doc-icon">●</span>
+    <span id="savedDocInfo"></span>
+  </div>
+
+  <div class="search-bar" id="searchBar" style="display:none">
+    <input type="text" id="searchInput" placeholder="Search by name, category..." oninput="filterTable()">
+    <span class="done-btn" onclick="document.getElementById('searchInput').blur()">Done</span>
+  </div>
+
+  <div id="tableArea">
+    <div class="empty-state">
+      <h3>No items yet</h3>
+      <p>Upload your Procure Wizard CSV to get started.</p>
+    </div>
+  </div>
+
+  <div class="actions" id="actionsArea" style="display:none">
+    <button class="action-btn btn-save" onclick="saveStocktake()">Save</button>
+    <button class="action-btn btn-update" onclick="updateStocktake()">Update</button>
+    <button class="action-btn btn-export" onclick="exportCSV()">Export CSV</button>
+    <button class="action-btn btn-print" onclick="printTotal()">Print</button>
+    <select class="action-btn btn-print" onchange="handlePdfSelect(this)" style="cursor:pointer">
+      <option value="">PDF ▾</option>
+      <option value="all">All Info (by location)</option>
+      <option value="final">Final Count</option>
+      <option value="disc">Discontinued</option>
+      <option value="zeros">0's (not counted)</option>
+    </select>
+    <button class="action-btn btn-delete" onclick="deleteStocktake()">Delete</button>
+  </div>
+</div>
+
+<!-- Par Levels Modal -->
+<div class="modal-overlay" id="parModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Par Levels — Default Inventory</h3>
+      <span class="x" onclick="closeParModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p class="modal-note">
+        Products with a par level are <strong>always pre-filled</strong> with that quantity every time
+        a stocktake is opened, and stay marked until you change or clear the value here.
+        Leave blank to remove a product's par level.
+      </p>
+      <div class="ctrl-group" style="margin-bottom:12px">
+        <label>Apply to location</label>
+        <select id="parLocSelect" class="par-loc-select"></select>
+      </div>
+      <input type="text" class="par-search" id="parSearch" placeholder="Search products..." oninput="renderParList()">
+      <div id="parList"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="action-btn btn-delete" onclick="clearAllPar()">Clear All</button>
+      <button class="action-btn btn-save" onclick="saveParLevels()">Save Par Levels</button>
+    </div>
+  </div>
+</div>
+
+<div class="status-msg" id="statusMsg"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="auth.js"></script>
+<script>
+// ── Configuration per section ──
+var SECTION_LOCATIONS = {
+  wine: ['Downstairs Cellar','Main Cellar','Bar Wine Fridge','Premium Wine Fridge'],
+  bar: ['Downstairs Cellar','Bar Shelves','Bar Under Till','Wine Fridge','Softs Fridge']
+};
+
+// ── State ──
+var currentUser = null;
+var currentTab = new URLSearchParams(window.location.search).get('tab') || 'wine';
+var metaLine = '';
+var headerLine = '';
+var headers = [];
+var rows = [];
+var closeFC_idx = -1;
+var closeSC_idx = -1;
+var cat_idx = -1;
+var name_idx = -1;
+var hiddenCols = [];
+var locationData = [];
+var lockedCols = {};
+var docExists = false;
+var docInfo = {};
+var discontinuedData = [];
+
+// Par levels: { productName: { location: qty, ... }, ... } per section
+var parLevels = {};
+
+var HIDDEN_HEADERS = ['pid','[e]stock type','[e]bin number','[e]pos','tertiary category','[e]close fc','[e]close sc'];
+
+function getLocations(){ return SECTION_LOCATIONS[currentTab] || []; }
+
+function buildHiddenCols(){
+  hiddenCols = [];
+  for(var h=0; h<headers.length; h++){
+    var col = headers[h].trim().toLowerCase();
+    if(HIDDEN_HEADERS.indexOf(col) > -1) hiddenCols.push(h);
+  }
+}
+function isHidden(colIdx){ return hiddenCols.indexOf(colIdx) > -1; }
+
+// ── Auth & Roles ──
+var READONLY_USERS = ['milena@savoy.local'];
+var isReadOnly = false;
+
+auth.onAuthStateChanged(function(user){
+  if(!user){window.location.href='index.html';return;}
+  currentUser = user;
+  isReadOnly = READONLY_USERS.indexOf(user.email) > -1;
+  logAccess(user,'page_view','somm-stocktake.html');
+  document.getElementById('tabWine').classList.toggle('active', currentTab === 'wine');
+  document.getElementById('tabBar').classList.toggle('active', currentTab === 'bar');
+  initControls();
+  if(isReadOnly){
+    document.querySelector('.controls').style.display = 'none';
+    document.getElementById('searchBar').style.display = 'none';
+  }
+  loadParLevels(function(){ loadStocktake(); });
+});
+
+function initControls(){
+  var sel = document.getElementById('monthSelect');
+  var now = new Date();
+  for(var i=0; i<2; i++){
+    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    var val = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+    var label = d.toLocaleDateString('en-GB',{month:'long', year:'numeric'});
+    var opt = document.createElement('option');
+    opt.value = val; opt.textContent = label;
+    sel.appendChild(opt);
+  }
+  sel.addEventListener('change', function(){ loadStocktake(); });
+  document.getElementById('dateInput').value = new Date().toISOString().slice(0,10);
+}
+
+function getSelectedMonth(){ return document.getElementById('monthSelect').value; }
+function getSelectedDate(){ return document.getElementById('dateInput').value; }
+
+// ── Tab Switching ──
+function switchTab(tab){
+  currentTab = tab;
+  document.getElementById('tabWine').classList.toggle('active', tab === 'wine');
+  document.getElementById('tabBar').classList.toggle('active', tab === 'bar');
+  var url = new URL(window.location);
+  url.searchParams.set('tab', tab);
+  window.history.replaceState({}, '', url);
+  rows = []; headers = []; metaLine = ''; headerLine = ''; locationData = []; lockedCols = {};
+  docExists = false; docInfo = {};
+  updateDocIndicator();
+  renderTable();
+  loadParLevels(function(){ loadStocktake(); });
+}
+
+// ── CSV Parsing ──
+document.getElementById('csvFile').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){ parseFullCSV(ev.target.result); };
+  reader.readAsText(file, 'windows-1252');
+  e.target.value = '';
+});
+
+function parseCSVLine(line){
+  var result = []; var current = ''; var inQuotes = false;
+  for(var i=0; i<line.length; i++){
+    var ch = line[i];
+    if(ch === '"'){ inQuotes = !inQuotes; }
+    else if(ch === ',' && !inQuotes){ result.push(current); current = ''; }
+    else { current += ch; }
+  }
+  result.push(current);
+  return result;
+}
+
+function parseFullCSV(text){
+  var lines = text.split(/\r?\n/);
+  metaLine = lines[0] || '';
+  headerLine = lines[1] || '';
+  headers = parseCSVLine(headerLine);
+
+  closeFC_idx = -1; closeSC_idx = -1; cat_idx = -1; name_idx = -1;
+  for(var h=0; h<headers.length; h++){
+    var col = headers[h].trim().toLowerCase();
+    if(col === '[e]close fc') closeFC_idx = h;
+    if(col === '[e]close sc') closeSC_idx = h;
+    if(col.indexOf('tertiary') > -1 || col.indexOf('category') > -1) cat_idx = h;
+    if(col.indexOf('brand') > -1 || col.indexOf('description') > -1) name_idx = h;
+  }
+  buildHiddenCols();
+
+  rows = [];
+  for(var i=2; i<lines.length; i++){
+    var line = lines[i].trim();
+    if(!line) continue;
+    if(line.endsWith(',')) line = line.slice(0,-1);
+    rows.push(parseCSVLine(line));
+  }
+
+  if(cat_idx > -1){
+    rows.sort(function(a,b){
+      var ca = (a[cat_idx]||'').toLowerCase();
+      var cb = (b[cat_idx]||'').toLowerCase();
+      return ca < cb ? -1 : ca > cb ? 1 : 0;
+    });
+  }
+
+  initLocationData();
+  applyParLevels();
+  renderTable();
+  showStatus(rows.length + ' items loaded from CSV');
+}
+
+function initLocationData(){
+  var locs = getLocations();
+  locationData = []; discontinuedData = [];
+  for(var i=0; i<rows.length; i++){
+    var loc = {};
+    for(var l=0; l<locs.length; l++) loc[locs[l]] = '';
+    locationData.push(loc);
+    discontinuedData.push(false);
+  }
+}
+
+function calcTotal(rowIdx){
+  var locs = getLocations();
+  var total = 0;
+  for(var l=0; l<locs.length; l++){
+    var v = parseFloat(locationData[rowIdx][locs[l]]);
+    if(!isNaN(v)) total += v;
+  }
+  return total;
+}
+
+function getRowName(i){
+  return name_idx > -1 ? (rows[i][name_idx]||'').trim() : '';
+}
+
+// ── Par Levels ──────────────────────────────────────────────
+function parDocId(){ return 'par_' + currentTab; }
+
+function loadParLevels(cb){
+  db.collection('savoy_par_levels').doc(parDocId()).get().then(function(doc){
+    parLevels = doc.exists ? (doc.data().levels || {}) : {};
+    if(cb) cb();
+  }).catch(function(e){ console.error('Par load error:', e); parLevels = {}; if(cb) cb(); });
+}
+
+// Returns the par qty for a product+location, or '' if none
+function getPar(name, loc){
+  if(parLevels[name] && parLevels[name][loc] !== undefined && parLevels[name][loc] !== '')
+    return parLevels[name][loc];
+  return '';
+}
+
+// Whether a product has any par level set
+function hasParForRow(i){
+  var name = getRowName(i);
+  var p = parLevels[name];
+  if(!p) return false;
+  for(var k in p){ if(p[k] !== '' && p[k] !== undefined) return true; }
+  return false;
+}
+
+// Fill locationData from par levels (only where cell is empty)
+function applyParLevels(){
+  if(!rows.length) return;
+  var locs = getLocations();
+  for(var i=0; i<rows.length; i++){
+    var name = getRowName(i);
+    if(!parLevels[name]) continue;
+    for(var l=0; l<locs.length; l++){
+      var par = getPar(name, locs[l]);
+      if(par !== '' && (!locationData[i][locs[l]] || locationData[i][locs[l]] === '')){
+        locationData[i][locs[l]] = String(par);
+      }
+    }
+  }
+}
+
+function countParProducts(){
+  return Object.keys(parLevels).filter(function(n){
+    var p = parLevels[n];
+    for(var k in p){ if(p[k] !== '' && p[k] !== undefined) return true; }
+    return false;
+  }).length;
+}
+
+// ── Par Modal ──
+function openParModal(){
+  if(!rows.length){ showStatus('Upload a CSV first to choose products'); return; }
+  var sel = document.getElementById('parLocSelect');
+  sel.innerHTML = '';
+  var locs = getLocations();
+  for(var l=0; l<locs.length; l++){
+    var o = document.createElement('option'); o.value = locs[l]; o.textContent = locs[l];
+    sel.appendChild(o);
+  }
+  sel.onchange = renderParList;
+  document.getElementById('parSearch').value = '';
+  renderParList();
+  document.getElementById('parModal').classList.add('active');
+}
+
+function closeParModal(){ document.getElementById('parModal').classList.remove('active'); }
+
+function renderParList(){
+  var loc = document.getElementById('parLocSelect').value;
+  var term = document.getElementById('parSearch').value.toLowerCase().trim();
+  var el = document.getElementById('parList');
+  var h = '';
+  for(var i=0; i<rows.length; i++){
+    var name = getRowName(i);
+    if(!name) continue;
+    if(term && name.toLowerCase().indexOf(term) < 0) continue;
+    var cat = cat_idx > -1 ? (rows[i][cat_idx]||'').trim() : '';
+    var cur = getPar(name, loc);
+    var hasPar = hasParForRow(i);
+    h += '<div class="par-item' + (hasPar ? ' has-par' : '') + '">';
+    h += '<div class="p-name">' + escHtml(name) + '<small>' + escHtml(cat) + '</small></div>';
+    h += '<input class="p-qty" type="number" min="0" step="0.5" value="' + escHtml(String(cur)) + '" data-name="' + escHtml(name) + '" placeholder="—">';
+    h += '</div>';
+  }
+  if(!h) h = '<p style="color:#aaa;font-size:12px;text-align:center;padding:20px">No products match.</p>';
+  el.innerHTML = h;
+}
+
+function saveParLevels(){
+  var loc = document.getElementById('parLocSelect').value;
+  var inputs = document.querySelectorAll('#parList .p-qty');
+  for(var i=0; i<inputs.length; i++){
+    var name = inputs[i].getAttribute('data-name');
+    var val = inputs[i].value.trim();
+    if(!parLevels[name]) parLevels[name] = {};
+    if(val === ''){
+      delete parLevels[name][loc];
+      if(Object.keys(parLevels[name]).length === 0) delete parLevels[name];
+    } else {
+      parLevels[name][loc] = val;
+    }
+  }
+  var author = currentUser.displayName || currentUser.email.split('@')[0].replace(/\./g,' ');
+  db.collection('savoy_par_levels').doc(parDocId()).set({
+    section: currentTab,
+    levels: parLevels,
+    updatedBy: author,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    closeParModal();
+    applyParLevels();
+    renderTable();
+    showStatus('Par levels saved ✓');
+  }).catch(function(e){ console.error(e); showStatus('Error saving par levels'); });
+}
+
+function clearAllPar(){
+  if(!confirm('Clear ALL par levels for ' + currentTab.toUpperCase() + '? This cannot be undone.')) return;
+  parLevels = {};
+  db.collection('savoy_par_levels').doc(parDocId()).set({
+    section: currentTab, levels: {},
+    updatedBy: currentUser.displayName || currentUser.email,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){
+    closeParModal();
+    renderTable();
+    showStatus('All par levels cleared');
+  }).catch(function(e){ console.error(e); });
+}
+
+// ── Render ──
+var searchTerm = '';
+function filterTable(){
+  searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+  renderTable();
+}
+
+function renderTable(){
+  var area = document.getElementById('tableArea');
+  var parCount = countParProducts();
+  var parInfo = document.getElementById('infoPar');
+  if(parCount > 0){ parInfo.style.display = 'inline-block'; parInfo.textContent = parCount + ' par-level product' + (parCount>1?'s':''); }
+  else { parInfo.style.display = 'none'; }
+
+  if(rows.length === 0){
+    var emptyMsg = isReadOnly ? 'No stocktake data available yet.' : 'Upload your Procure Wizard CSV to get started.';
+    area.innerHTML = '<div class="empty-state"><h3>No items yet</h3><p>' + emptyMsg + '</p></div>';
+    document.getElementById('actionsArea').style.display = 'none';
+    document.getElementById('infoBar').style.display = 'none';
+    document.getElementById('searchBar').style.display = 'none';
+    return;
+  }
+
+  if(isReadOnly){
+    document.getElementById('infoBar').style.display = 'flex';
+    document.getElementById('infoCount').textContent = rows.length + ' products';
+    document.getElementById('infoMeta').textContent = currentTab.toUpperCase();
+    document.getElementById('searchBar').style.display = 'none';
+
+    var html = '<div class="stock-table-wrap"><table class="stock-table"><thead><tr>';
+    html += '<th>Brand & Description</th><th>Pack Size</th><th class="total-header">Total</th>';
+    html += '</tr></thead><tbody>';
+    var lastCat = '';
+    for(var i=0; i<rows.length; i++){
+      if(discontinuedData[i]) continue;
+      var row = rows[i];
+      var total = calcTotal(i);
+      if(cat_idx > -1){
+        var thisCat = (row[cat_idx]||'').trim();
+        if(thisCat && thisCat !== lastCat){
+          html += '<tr class="cat-row"><td colspan="3">' + escHtml(thisCat) + '</td></tr>';
+          lastCat = thisCat;
+        }
+      }
+      var name = name_idx > -1 ? (row[name_idx]||'').trim() : '';
+      var pack = '';
+      for(var c=0; c<headers.length; c++){
+        if(headers[c].trim().toLowerCase() === 'pack size'){ pack = (row[c]||'').trim(); break; }
+      }
+      var totalStr = total > 0 ? String(total) : '-';
+      html += '<tr><td class="name-cell">' + escHtml(name) + '</td><td class="num-cell">' + escHtml(pack) + '</td><td class="total-cell">' + totalStr + '</td></tr>';
+    }
+    html += '</tbody></table></div>';
+    area.innerHTML = html;
+    document.getElementById('actionsArea').style.display = 'flex';
+    document.getElementById('actionsArea').innerHTML = '<button class="action-btn btn-save" onclick="downloadPDF()">PDF</button>';
+    return;
+  }
+
+  var locs = getLocations();
+  document.getElementById('searchBar').style.display = 'block';
+  document.getElementById('infoBar').style.display = 'flex';
+  document.getElementById('infoCount').textContent = rows.length + ' products';
+  document.getElementById('infoMeta').textContent = currentTab.toUpperCase() + ' — ' + (metaLine.replace('<-- Do not delete or edit','').replace(/,/g,' ').trim());
+
+  var html = '<div class="stock-table-wrap"><table class="stock-table"><thead><tr>';
+  var visibleCount = 0;
+  for(var h=0; h<headers.length; h++){
+    if(isHidden(h)) continue;
+    html += '<th>' + escHtml(headers[h].trim()) + '</th>';
+    visibleCount++;
+  }
+  html += '<th>X</th>';
+  for(var l=0; l<locs.length; l++){
+    var isLocked = lockedCols[locs[l]] && lockedCols[locs[l]].locked;
+    var lockClass = isLocked ? ' is-locked' : '';
+    var lockLabel = isLocked ? 'Locked' : 'Lock';
+    var lockInfo = isLocked ? '<div class="lock-info"><em>by</em> ' + escHtml(lockedCols[locs[l]].by || '') + '</div>' : '';
+    html += '<th><div class="loc-header-name">' + escHtml(locs[l]).replace(/\s+/g,'<br>') + '</div><div class="loc-header-lock"><span class="lock-btn' + lockClass + '" onclick="toggleLock(\'' + locs[l].replace(/'/g,"\\'") + '\')">' + lockLabel + '</span></div>' + lockInfo + '</th>';
+  }
+  html += '<th class="total-header">Total</th>';
+  var totalCols = visibleCount + locs.length + 2;
+  html += '</tr></thead><tbody>';
+
+  var lastCat = '';
+  for(var i=0; i<rows.length; i++){
+    var row = rows[i];
+    if(searchTerm){
+      var matchText = ((row[name_idx]||'') + ' ' + (row[cat_idx]||'')).toLowerCase();
+      var words = searchTerm.split(/\s+/);
+      var allMatch = words.every(function(w){ return matchText.indexOf(w) > -1; });
+      if(!allMatch) continue;
+    }
+    if(cat_idx > -1){
+      var thisCat = (row[cat_idx]||'').trim();
+      if(thisCat && thisCat !== lastCat){
+        html += '<tr class="cat-row"><td colspan="' + totalCols + '">' + escHtml(thisCat) + '</td></tr>';
+        lastCat = thisCat;
+      }
+    }
+
+    var rowHasPar = hasParForRow(i);
+    var rowName = getRowName(i);
+    html += '<tr' + (discontinuedData[i] ? ' class="disc-row"' : '') + '>';
+    for(var c=0; c<headers.length; c++){
+      if(isHidden(c)) continue;
+      var val = (row[c]||'').trim();
+      if(c === name_idx){
+        html += '<td class="name-cell">' + escHtml(val) + (rowHasPar ? '<span class="par-badge">Par</span>' : '') + '</td>';
+      } else {
+        html += '<td class="num-cell">' + escHtml(val) + '</td>';
+      }
+    }
+    var discChecked = discontinuedData[i] ? ' checked' : '';
+    html += '<td style="text-align:center"><input type="checkbox" class="disc-check"' + discChecked + ' data-row="' + i + '" onchange="toggleDiscontinued(this)"></td>';
+    for(var l=0; l<locs.length; l++){
+      var locVal = locationData[i] ? (locationData[i][locs[l]] || '') : '';
+      var isLocked = lockedCols[locs[l]] && lockedCols[locs[l]].locked;
+      var disabledAttr = isLocked || discontinuedData[i] ? ' disabled' : '';
+      var lockedClass = isLocked || discontinuedData[i] ? ' locked' : '';
+      var parHere = getPar(rowName, locs[l]);
+      var parClass = (parHere !== '' && String(locVal) === String(parHere)) ? ' par-filled' : '';
+      html += '<td><input class="qty-input' + lockedClass + parClass + '" type="number" min="0" step="0.5" value="' + escHtml(String(locVal)) + '" data-row="' + i + '" data-loc="' + locs[l] + '" onchange="setLocValue(this)"' + disabledAttr + '></td>';
+    }
+    var total = calcTotal(i);
+    var totalDisplay = total > 0 ? total : '';
+    html += '<td class="total-cell">' + totalDisplay + '</td>';
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  area.innerHTML = html;
+  document.getElementById('actionsArea').style.display = 'flex';
+}
+
+function setLocValue(el){
+  var r = parseInt(el.getAttribute('data-row'));
+  var loc = el.getAttribute('data-loc');
+  locationData[r][loc] = el.value;
+  // Update par-filled highlight
+  var par = getPar(getRowName(r), loc);
+  if(par !== '' && String(el.value) === String(par)) el.classList.add('par-filled');
+  else el.classList.remove('par-filled');
+  var total = calcTotal(r);
+  if(closeSC_idx > -1){ rows[r][closeSC_idx] = total > 0 ? String(total) : ''; }
+  var tr = el.closest('tr');
+  var totalCell = tr.querySelector('.total-cell');
+  if(totalCell) totalCell.textContent = total > 0 ? total : '';
+}
+
+function toggleDiscontinued(el){
+  var r = parseInt(el.getAttribute('data-row'));
+  discontinuedData[r] = el.checked;
+  renderTable();
+}
+
+function toggleLock(locName){
+  var author = currentUser.displayName || currentUser.email.split('@')[0].replace(/\./g,' ');
+  if(lockedCols[locName] && lockedCols[locName].locked){
+    lockedCols[locName] = {locked: false, by: ''};
+  } else {
+    lockedCols[locName] = {locked: true, by: author};
+  }
+  if(docExists){
+    db.collection('savoy_stocktake').doc(getDocId()).set({lockedCols: lockedCols, updatedAt: firebase.firestore.FieldValue.serverTimestamp()}, {merge:true}).then(function(){
+      showStatus(locName + (lockedCols[locName].locked ? ' locked' : ' unlocked'));
+    }).catch(function(e){ console.error(e); });
+  }
+  renderTable();
+}
+
+function escHtml(str){
+  if(!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Export CSV ──
+function exportCSV(){
+  if(rows.length === 0){ showStatus('Nothing to export'); return; }
+  var csvContent = metaLine + '\r\n' + headerLine + '\r\n';
+  for(var i=0; i<rows.length; i++){
+    var line = '';
+    for(var c=0; c<rows[i].length; c++){
+      var val = rows[i][c] || '';
+      if(val.indexOf(',') > -1 || val.indexOf('"') > -1){ val = '"' + val.replace(/"/g,'""') + '"'; }
+      else { val = '"' + val + '"'; }
+      line += val;
+      if(c < rows[i].length - 1) line += ',';
+    }
+    line += ',';
+    csvContent += line + '\r\n';
+  }
+  var bytes = new Uint8Array(csvContent.length);
+  for(var b=0; b<csvContent.length; b++){ bytes[b] = csvContent.charCodeAt(b) & 0xFF; }
+  var blob = new Blob([bytes], {type:'text/csv'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'Savoy-Stocktake-' + currentTab + '-' + getSelectedMonth() + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showStatus('CSV exported ✓');
+}
+
+// ── Firestore Save / Load ──
+function getDocId(){ return 'stocktake_' + currentTab + '_' + getSelectedMonth(); }
+
+function saveStocktake(){
+  if(rows.length === 0){ showStatus('Nothing to save'); return; }
+  var author = currentUser.displayName || currentUser.email.split('@')[0].replace(/\./g,' ');
+  var id = getDocId();
+  var rowStrings = rows.map(function(r){ return r.join('|||'); });
+  var payload = {
+    section: currentTab, month: getSelectedMonth(), date: getSelectedDate(),
+    metaLine: metaLine, headerLine: headerLine, headers: headers,
+    rowStrings: rowStrings, locationData: locationData,
+    discontinuedData: discontinuedData, lockedCols: lockedCols,
+    createdBy: author,
+    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  db.collection('savoy_stocktake').doc(id).set(payload).then(function(){
+    docExists = true;
+    docInfo = {createdBy: author, date: getSelectedDate(), updatedBy: ''};
+    updateDocIndicator();
+    showStatus('Stocktake saved ✓');
+  }).catch(function(e){ console.error('Save error:', e); showStatus('Error: ' + e.message); });
+}
+
+function updateStocktake(){
+  if(rows.length === 0){ showStatus('Nothing to update'); return; }
+  var author = currentUser.displayName || currentUser.email.split('@')[0].replace(/\./g,' ');
+  var rowStrings = rows.map(function(r){ return r.join('|||'); });
+  var payload = {
+    rowStrings: rowStrings, locationData: locationData,
+    discontinuedData: discontinuedData, lockedCols: lockedCols,
+    date: getSelectedDate(), updatedBy: author,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+  db.collection('savoy_stocktake').doc(getDocId()).set(payload, {merge:true}).then(function(){
+    docInfo.updatedBy = author; docInfo.date = getSelectedDate();
+    updateDocIndicator();
+    showStatus('Stocktake updated ✓');
+  }).catch(function(e){ console.error(e); showStatus('Error updating: ' + e.message); });
+}
+
+function loadStocktake(){
+  var id = getDocId();
+  db.collection('savoy_stocktake').doc(id).get().then(function(doc){
+    if(doc.exists){
+      var data = doc.data();
+      metaLine = data.metaLine || '';
+      headerLine = data.headerLine || '';
+      headers = data.headers || [];
+      if(headers.length === 0 && headerLine){ headers = parseCSVLine(headerLine); }
+      if(data.rowStrings && data.rowStrings.length > 0){
+        rows = data.rowStrings.map(function(s){ return s.split('|||'); });
+      } else { rows = []; }
+      closeFC_idx = -1; closeSC_idx = -1; cat_idx = -1; name_idx = -1;
+      for(var h=0; h<headers.length; h++){
+        var col = headers[h].trim().toLowerCase();
+        if(col === '[e]close fc') closeFC_idx = h;
+        if(col === '[e]close sc') closeSC_idx = h;
+        if(col.indexOf('tertiary') > -1 || col.indexOf('category') > -1) cat_idx = h;
+        if(col.indexOf('brand') > -1 || col.indexOf('description') > -1) name_idx = h;
+      }
+      buildHiddenCols();
+      if(data.date) document.getElementById('dateInput').value = data.date;
+      if(data.locationData && data.locationData.length === rows.length){ locationData = data.locationData; }
+      else { initLocationData(); }
+      if(data.discontinuedData && data.discontinuedData.length === rows.length){ discontinuedData = data.discontinuedData; }
+      else { discontinuedData = rows.map(function(){ return false; }); }
+      lockedCols = data.lockedCols || {};
+      docExists = true;
+      docInfo = {createdBy: data.createdBy || '', date: data.date || '', updatedBy: data.updatedBy || ''};
+      applyParLevels();
+      updateDocIndicator();
+      renderTable();
+      if(rows.length > 0) showStatus('Loaded ' + rows.length + ' items');
+    } else {
+      rows = []; headers = []; metaLine = ''; headerLine = '';
+      locationData = []; lockedCols = {};
+      docExists = false; docInfo = {};
+      updateDocIndicator();
+      renderTable();
+    }
+  }).catch(function(e){ console.error(e); });
+}
+
+function updateDocIndicator(){
+  var el = document.getElementById('savedDoc');
+  var infoEl = document.getElementById('savedDocInfo');
+  if(docExists && rows.length > 0){
+    el.style.display = 'flex';
+    var text = currentTab.toUpperCase() + ' — ' + getSelectedMonth();
+    if(docInfo.date) text += ' — saved ' + docInfo.date;
+    if(docInfo.updatedBy) text += ' — last update by ' + docInfo.updatedBy;
+    else if(docInfo.createdBy) text += ' — created by ' + docInfo.createdBy;
+    infoEl.textContent = text;
+  } else { el.style.display = 'none'; }
+  updateActionButtons();
+}
+
+function updateActionButtons(){
+  var saveBtn = document.querySelector('.btn-save');
+  var updateBtn = document.querySelector('.btn-update');
+  if(saveBtn && updateBtn){
+    if(docExists){ saveBtn.style.display = 'none'; updateBtn.style.display = 'inline-block'; }
+    else { saveBtn.style.display = 'inline-block'; updateBtn.style.display = 'none'; }
+  }
+}
+
+// ── Print / PDF ──
+function buildTotalTable(){
+  var html = '<html><head><meta charset="UTF-8">';
+  html += '<style>body{font-family:Inter,sans-serif;padding:20px}h2{font-family:"Cormorant Garamond",serif;color:#14304f;margin-bottom:4px}';
+  html += 'table{width:100%;border-collapse:collapse;margin-top:12px}th{background:#14304f;color:#fff;padding:8px;font-size:10px;text-transform:uppercase;text-align:left}';
+  html += 'td{padding:6px 8px;font-size:11px;border-bottom:1px solid #ddd}.total{font-weight:700;text-align:center}';
+  html += '.cat-row td{background:#e8eef5;font-weight:700;color:#14304f;font-size:11px;padding:8px}</style></head><body>';
+  html += '<h2>Savoy Stocktake \u2014 ' + currentTab.toUpperCase() + '</h2>';
+  html += '<p style="font-size:11px;color:#888">' + getSelectedMonth() + ' \u2014 ' + getSelectedDate() + '</p>';
+  html += '<table><thead><tr><th>Brand & Description</th><th>Pack Size</th><th>Total</th></tr></thead><tbody>';
+  var lastCat = '';
+  for(var i=0; i<rows.length; i++){
+    if(discontinuedData[i]) continue;
+    var row = rows[i];
+    var total = calcTotal(i);
+    if(cat_idx > -1){
+      var thisCat = (row[cat_idx]||'').trim();
+      if(thisCat && thisCat !== lastCat){
+        html += '<tr class="cat-row"><td colspan="3">' + escHtml(thisCat) + '</td></tr>';
+        lastCat = thisCat;
+      }
+    }
+    var name = name_idx > -1 ? (row[name_idx]||'').trim() : '';
+    var pack = '';
+    for(var c=0; c<headers.length; c++){
+      if(headers[c].trim().toLowerCase() === 'pack size'){ pack = (row[c]||'').trim(); break; }
+    }
+    var totalStr = total > 0 ? String(total) : '-';
+    html += '<tr><td>' + escHtml(name) + '</td><td>' + escHtml(pack) + '</td><td class="total">' + totalStr + '</td></tr>';
+  }
+  html += '</tbody></table></body></html>';
+  return html;
+}
+
+function printTotal(){
+  var content = buildTotalTable();
+  var win = window.open('','_blank');
+  win.document.write(content);
+  win.document.close();
+  win.onload = function(){ win.print(); };
+}
+
+function sanitizeForPDF(str){
+  if(!str) return '';
+  return str
+    .replace(/[\u00E0\u00E1\u00E2\u00E3\u00E4\u00E5]/g, 'a')
+    .replace(/[\u00C0\u00C1\u00C2\u00C3\u00C4\u00C5]/g, 'A')
+    .replace(/[\u00E8\u00E9\u00EA\u00EB]/g, 'e')
+    .replace(/[\u00C8\u00C9\u00CA\u00CB]/g, 'E')
+    .replace(/[\u00EC\u00ED\u00EE\u00EF]/g, 'i')
+    .replace(/[\u00CC\u00CD\u00CE\u00CF]/g, 'I')
+    .replace(/[\u00F2\u00F3\u00F4\u00F5\u00F6]/g, 'o')
+    .replace(/[\u00D2\u00D3\u00D4\u00D5\u00D6]/g, 'O')
+    .replace(/[\u00F9\u00FA\u00FB\u00FC]/g, 'u')
+    .replace(/[\u00D9\u00DA\u00DB\u00DC]/g, 'U')
+    .replace(/\u00F1/g, 'n').replace(/\u00D1/g, 'N')
+    .replace(/\u00E7/g, 'c').replace(/\u00C7/g, 'C')
+    .replace(/\u00DF/g, 'ss')
+    .replace(/[^\x20-\x7E]/g, '');
+}
+
+function downloadPDF(){
+  if(rows.length === 0){ showStatus('Nothing to export'); return; }
+  var { jsPDF } = window.jspdf;
+  var doc = new jsPDF();
+  doc.setFontSize(16); doc.setTextColor(20, 48, 79);
+  doc.text('Savoy Stocktake - ' + currentTab.toUpperCase(), 14, 20);
+  doc.setFontSize(10); doc.setTextColor(100);
+  doc.text(getSelectedMonth() + ' - ' + getSelectedDate(), 14, 27);
+  var tableRows = []; var lastCat = '';
+  for(var i=0; i<rows.length; i++){
+    if(discontinuedData[i]) continue;
+    var row = rows[i]; var total = calcTotal(i);
+    if(cat_idx > -1){
+      var thisCat = (row[cat_idx]||'').trim();
+      if(thisCat && thisCat !== lastCat){
+        tableRows.push([{content: sanitizeForPDF(thisCat), colSpan: 3, styles: {fillColor: [232,238,245], textColor: [20,48,79], fontStyle: 'bold'}}]);
+        lastCat = thisCat;
+      }
+    }
+    var name = name_idx > -1 ? sanitizeForPDF((row[name_idx]||'').trim()) : '';
+    var pack = '';
+    for(var c=0; c<headers.length; c++){
+      if(headers[c].trim().toLowerCase() === 'pack size'){ pack = (row[c]||'').trim(); break; }
+    }
+    var totalStr = total > 0 ? String(total) : '-';
+    tableRows.push([name, pack, totalStr]);
+  }
+  doc.autoTable({
+    startY: 32,
+    head: [['Brand & Description', 'Pack Size', 'Total']],
+    body: tableRows,
+    headStyles: {fillColor: [20, 48, 79], textColor: [255,255,255], fontSize: 8},
+    bodyStyles: {fontSize: 8},
+    columnStyles: {2: {halign: 'center', fontStyle: 'bold'}},
+    margin: {left: 14, right: 14}
+  });
+  doc.save('Savoy-Stocktake-' + currentTab + '-' + getSelectedMonth() + '.pdf');
+  showStatus('PDF downloaded');
+}
+
+function downloadDiscontinuedPDF(){
+  if(rows.length === 0){ showStatus('Nothing to export'); return; }
+  var discItems = [];
+  for(var i=0; i<rows.length; i++){
+    if(!discontinuedData[i]) continue;
+    var row = rows[i];
+    var name = name_idx > -1 ? sanitizeForPDF((row[name_idx]||'').trim()) : '';
+    var cat = cat_idx > -1 ? sanitizeForPDF((row[cat_idx]||'').trim()) : '';
+    var pack = '';
+    for(var c=0; c<headers.length; c++){
+      if(headers[c].trim().toLowerCase() === 'pack size'){ pack = (row[c]||'').trim(); break; }
+    }
+    discItems.push([name, cat, pack]);
+  }
+  if(discItems.length === 0){ showStatus('No discontinued items marked'); return; }
+  var { jsPDF } = window.jspdf;
+  var doc = new jsPDF();
+  doc.setFontSize(16); doc.setTextColor(20, 48, 79);
+  doc.text('Discontinued Items - ' + currentTab.toUpperCase(), 14, 20);
+  doc.setFontSize(10); doc.setTextColor(100);
+  doc.text(getSelectedMonth() + ' - ' + discItems.length + ' items to remove', 14, 27);
+  doc.autoTable({
+    startY: 32,
+    head: [['Brand & Description', 'Category', 'Pack Size']],
+    body: discItems,
+    headStyles: {fillColor: [192, 57, 43], textColor: [255,255,255], fontSize: 8},
+    bodyStyles: {fontSize: 8},
+    margin: {left: 14, right: 14}
+  });
+  doc.save('Savoy-Discontinued-' + currentTab + '-' + getSelectedMonth() + '.pdf');
+  showStatus('Discontinued PDF downloaded');
+}
+
+function handlePdfSelect(sel){
+  var val=sel.value; sel.value='';
+  if(val==='all')downloadAllInfoPDF();
+  else if(val==='final')downloadPDF();
+  else if(val==='disc')downloadDiscontinuedPDF();
+  else if(val==='zeros')downloadZerosPDF();
+}
+
+function downloadAllInfoPDF(){
+  if(rows.length === 0){ showStatus('Nothing to export'); return; }
+  var { jsPDF } = window.jspdf;
+  var doc = new jsPDF('landscape');
+  var locs = getLocations();
+  doc.setFontSize(16); doc.setTextColor(20,48,79);
+  doc.text('Savoy — Stocktake ' + currentTab.toUpperCase(), 14, 16);
+  doc.setFontSize(9); doc.setTextColor(100,100,100);
+  doc.text(getSelectedMonth() + ' — All Info by Location', 14, 22);
+  var tableHead = ['Brand & Description', 'Pack Size'];
+  for(var l=0;l<locs.length;l++) tableHead.push(sanitizeForPDF(locs[l]));
+  tableHead.push('Total');
+  var tableRows = []; var lastCat = '';
+  for(var i=0; i<rows.length; i++){
+    if(discontinuedData[i]) continue;
+    var row = rows[i];
+    if(cat_idx > -1){
+      var thisCat = (row[cat_idx]||'').trim();
+      if(thisCat && thisCat !== lastCat){
+        tableRows.push([{content: sanitizeForPDF(thisCat), colSpan: tableHead.length, styles: {fillColor: [232,238,245], textColor: [20,48,79], fontStyle: 'bold'}}]);
+        lastCat = thisCat;
+      }
+    }
+    var name = name_idx > -1 ? sanitizeForPDF((row[name_idx]||'').trim()) : '';
+    var pack = '';
+    for(var c=0; c<headers.length; c++){
+      var hdr=headers[c].trim().toLowerCase();
+      if(hdr.indexOf('pack')>-1||hdr.indexOf('size')>-1||hdr.indexOf('unit')>-1){pack=sanitizeForPDF((row[c]||'').trim());break;}
+    }
+    var rowData = [name, pack];
+    for(var l=0;l<locs.length;l++){ rowData.push(locationData[i]?locationData[i][locs[l]]||'':''); }
+    rowData.push(String(calcTotal(i)||''));
+    tableRows.push(rowData);
+  }
+  doc.autoTable({
+    startY: 26, head: [tableHead], body: tableRows,
+    headStyles: {fillColor: [20,48,79], textColor: [255,255,255], fontSize: 7},
+    bodyStyles: {fontSize: 7}, margin: {left: 10, right: 10},
+    columnStyles: {0: {cellWidth: 60}}
+  });
+  doc.save('Savoy-Stocktake-AllInfo-' + currentTab + '-' + getSelectedMonth() + '.pdf');
+  showStatus('All Info PDF downloaded');
+}
+
+function downloadZerosPDF(){
+  if(rows.length === 0){ showStatus('Nothing to export'); return; }
+  var zeroItems = [];
+  for(var i=0; i<rows.length; i++){
+    if(discontinuedData[i]) continue;
+    var total = calcTotal(i);
+    if(total === 0){
+      var row = rows[i];
+      var name = name_idx > -1 ? sanitizeForPDF((row[name_idx]||'').trim()) : '';
+      var cat = cat_idx > -1 ? sanitizeForPDF((row[cat_idx]||'').trim()) : '';
+      var pack = '';
+      for(var c=0; c<headers.length; c++){
+        var hdr=headers[c].trim().toLowerCase();
+        if(hdr.indexOf('pack')>-1||hdr.indexOf('size')>-1||hdr.indexOf('unit')>-1){pack=sanitizeForPDF((row[c]||'').trim());break;}
+      }
+      zeroItems.push([name, cat, pack]);
+    }
+  }
+  if(zeroItems.length === 0){ showStatus('No items with 0 count'); return; }
+  var { jsPDF } = window.jspdf;
+  var doc = new jsPDF();
+  doc.setFontSize(16); doc.setTextColor(20,48,79);
+  doc.text('Savoy — Not Counted / Zero Stock', 14, 16);
+  doc.setFontSize(9); doc.setTextColor(100,100,100);
+  doc.text(currentTab.toUpperCase() + ' — ' + getSelectedMonth() + ' — ' + zeroItems.length + ' items', 14, 22);
+  doc.autoTable({
+    startY: 28,
+    head: [['Brand & Description', 'Category', 'Pack Size']],
+    body: zeroItems,
+    headStyles: {fillColor: [184,150,80], textColor: [255,255,255], fontSize: 8},
+    bodyStyles: {fontSize: 8}, margin: {left: 14, right: 14}
+  });
+  doc.save('Savoy-Zeros-' + currentTab + '-' + getSelectedMonth() + '.pdf');
+  showStatus('Zeros PDF downloaded');
+}
+
+function deleteStocktake(){
+  if(!confirm('Delete this stocktake? This cannot be undone.')) return;
+  db.collection('savoy_stocktake').doc(getDocId()).delete().then(function(){
+    rows = []; headers = []; metaLine = ''; headerLine = '';
+    locationData = []; lockedCols = {};
+    docExists = false; docInfo = {};
+    updateDocIndicator();
+    renderTable();
+    showStatus('Stocktake deleted');
+  }).catch(function(e){ console.error(e); showStatus('Error deleting'); });
+}
+
+function showStatus(msg){
+  var el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function(){ el.classList.remove('show'); }, 2500);
+}
+
+// Close par modal on backdrop click / Escape
+document.getElementById('parModal').addEventListener('click', function(e){
+  if(e.target === this) closeParModal();
+});
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeParModal(); });
+</script>
+</body>
+</html>

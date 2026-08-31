@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wine — Savoy Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--green:#14304f;--green-dark:#0a1a2e;--gold:#b89650;--gold-light:#d4b87a;--cream:#faf7f1;--sans:'Inter',sans-serif;--serif:'Cormorant Garamond',serif}
+body{font-family:var(--sans);background:var(--cream);color:#2c2c2c;min-height:100vh}
+.top-bar{background:var(--green-dark);padding:12px 24px;display:flex;align-items:center;justify-content:space-between}
+.top-bar a{color:var(--gold);text-decoration:none;font-size:12px;letter-spacing:1px;text-transform:uppercase}
+.top-bar a:hover{color:#fff}
+.top-bar h2{font-family:var(--serif);color:#fff;font-size:18px;margin:0}
+.page{max-width:700px;margin:0 auto;padding:60px 24px;text-align:center}
+.page h1{font-family:var(--serif);font-size:34px;color:var(--green);margin-bottom:12px}
+.page p{color:#888;font-size:14px}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <a href="training.html">&larr; Back</a>
+  <h2>Savoy</h2>
+  <span></span>
+</div>
+<div class="page">
+  <h1>Wine Training</h1>
+  <p>Content coming soon.</p>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="auth.js"></script>
+<script src="guard.js"></script>
+</body>
+</html>

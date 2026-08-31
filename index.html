@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Savoy — Front of House</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #14304f;
+  --green-dark: #0a1a2e;
+  --gold: #b89650;
+  --gold-light: #d4b87a;
+  --cream: #faf7f1;
+  --white: #ffffff;
+  --text: #2c2c2c;
+  --serif: 'Cormorant Garamond', 'Georgia', serif;
+  --sans: 'Inter', 'Segoe UI', sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--green-dark);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.container { text-align: center; max-width: 500px; width: 100%; }
+
+.logo { margin-bottom: 8px; }
+.logo h1 {
+  font-family: var(--serif);
+  font-size: 52px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--gold-light);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 50px;
+  opacity: 0.85;
+}
+
+.divider {
+  width: 60px; height: 1px;
+  background: var(--gold);
+  margin: 0 auto 40px;
+  opacity: 0.5;
+}
+
+.nav-buttons { display: flex; flex-direction: column; gap: 14px; }
+
+.nav-btn {
+  display: block; width: 100%;
+  padding: 16px 24px;
+  background: transparent;
+  border: 1px solid rgba(184, 150, 80, 0.3);
+  border-radius: 6px;
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.nav-btn:hover {
+  background: rgba(184, 150, 80, 0.1);
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(184, 150, 80, 0.15);
+}
+
+.nav-btn:active { transform: translateY(0); }
+
+.user-status {
+  margin-bottom: 30px;
+  font-size: 12px;
+  color: var(--gold-light);
+  opacity: 0.8;
+  display: none;
+}
+
+.user-status span { font-weight: 500; }
+
+.user-status a {
+  color: var(--gold-light);
+  margin-left: 12px;
+  opacity: 0.7;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.user-status a:hover { opacity: 1; }
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.active { opacity: 1; visibility: visible; }
+
+.modal-box {
+  background: var(--cream);
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  min-width: 320px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 12px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--gold-light);
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-box { transform: translateY(0); }
+
+.modal-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  color: var(--green);
+  margin-bottom: 24px;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d4b87a;
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 14px;
+  text-align: center;
+  outline: none;
+  background: #fff;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+
+.modal-input:focus { border-color: var(--green); }
+.modal-input::placeholder { color: #aaa; }
+
+.modal-error { color: #c0392b; font-size: 12px; margin-bottom: 12px; min-height: 18px; }
+
+.modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 8px; }
+
+.btn-primary {
+  padding: 11px 32px;
+  background: var(--green);
+  color: var(--cream);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover { background: var(--green-dark); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-secondary {
+  padding: 11px 32px;
+  background: transparent;
+  color: #888;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.btn-secondary:hover { border-color: #aaa; color: #555; }
+
+.footer { margin-top: 60px; font-size: 10px; color: rgba(184, 150, 80, 0.4); letter-spacing: 1px; }
+
+@media (max-width: 600px) {
+  .logo h1 { font-size: 38px; }
+  .subtitle { font-size: 11px; margin-bottom: 36px; }
+  .nav-btn { padding: 14px 20px; font-size: 12px; }
+  .modal-box { padding: 30px 24px; min-width: unset; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo">
+    <h1>Savoy</h1>
+  </div>
+  <p class="subtitle">Front of House</p>
+
+  <div class="user-status" id="userStatus">
+    Logged in as <span id="userName"></span>
+    <a onclick="handleLogout()">Logout</a>
+  </div>
+
+  <div class="divider"></div>
+
+  <nav class="nav-buttons" id="navButtons" style="display:none;">
+    <a href="sommeliers.html" class="nav-btn">Sommeliers</a>
+    <a href="training.html" class="nav-btn">Training</a>
+  </nav>
+
+  <div id="loginPrompt" style="display:none;">
+    <p style="color:var(--gold-light);font-size:13px;margin-bottom:24px;opacity:0.8;">Sign in to access the site</p>
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+      <div onclick="quickLogin('fiorella')" style="cursor:pointer;padding:20px 24px;background:transparent;border:1px solid rgba(184,150,80,0.3);border-radius:10px;text-align:center;transition:all .2s;min-width:90px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;font-weight:600">F</div>
+        <div style="color:var(--gold-light);font-size:11px;letter-spacing:.5px;font-weight:500">Fiorella</div>
+      </div>
+      <div onclick="quickLogin('christian')" style="cursor:pointer;padding:20px 24px;background:transparent;border:1px solid rgba(184,150,80,0.3);border-radius:10px;text-align:center;transition:all .2s;min-width:90px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;font-weight:600">C</div>
+        <div style="color:var(--gold-light);font-size:11px;letter-spacing:.5px;font-weight:500">Christian</div>
+      </div>
+      <div onclick="quickLogin('milena')" style="cursor:pointer;padding:20px 24px;background:transparent;border:1px solid rgba(184,150,80,0.3);border-radius:10px;text-align:center;transition:all .2s;min-width:90px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;font-weight:600">M</div>
+        <div style="color:var(--gold-light);font-size:11px;letter-spacing:.5px;font-weight:500">Milena</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px">
+      <div onclick="quickLogin('guest')" style="cursor:pointer;display:inline-block;padding:10px 24px;border:1px solid rgba(184,150,80,0.3);border-radius:6px;color:var(--gold-light);font-size:12px;letter-spacing:1px;text-transform:uppercase;transition:all .2s">Guest</div>
+    </div>
+  </div>
+
+  <div class="footer">&copy; 2026 — Internal Use Only</div>
+</div>
+
+<div class="modal-overlay" id="loginModal">
+  <div class="modal-box">
+    <div class="modal-title">Team Login</div>
+    <input type="text" class="modal-input" id="loginName" placeholder="Your name" autocomplete="off">
+    <input type="password" class="modal-input" id="loginCode" placeholder="Personal code">
+    <div class="modal-error" id="loginError"></div>
+    <div class="modal-actions">
+      <button class="btn-primary" id="loginBtn" onclick="handleLogin()">Enter</button>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="auth.js"></script>
+
+<script>
+auth.onAuthStateChanged((user) => {
+  const status = document.getElementById('userStatus');
+  const nav = document.getElementById('navButtons');
+  const loginPrompt = document.getElementById('loginPrompt');
+
+  if (user) {
+    const displayName = user.displayName || user.email.split('@')[0].replace(/\./g, ' ');
+    document.getElementById('userName').textContent = displayName;
+    status.style.display = 'block';
+    loginPrompt.style.display = 'none';
+    logAccess(user, 'page_view', 'index.html');
+
+    var isGuest = user.email && user.email.startsWith('guest');
+    var sommAllowed = ['christian@savoy.local','milena@savoy.local','fiorella@savoy.local'];
+    var isSomm = sommAllowed.indexOf(user.email) >= 0;
+    if (isGuest) {
+      nav.style.display = 'flex';
+      nav.innerHTML = '<a href="training.html" class="nav-btn">Training</a>';
+    } else {
+      nav.style.display = 'flex';
+      var sommLink = nav.querySelector('a[href="sommeliers.html"]');
+      if (sommLink && !isSomm) sommLink.style.display = 'none';
+    }
+  } else {
+    status.style.display = 'none';
+    nav.style.display = 'none';
+    loginPrompt.style.display = 'block';
+  }
+});
+
+function quickLogin(name){
+  document.getElementById('loginModal').classList.add('active');
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('loginName').value = name;
+  document.getElementById('loginName').style.display = 'none';
+  document.getElementById('loginCode').value = '';
+  setTimeout(() => document.getElementById('loginCode').focus(), 100);
+}
+
+function openModal() {
+  document.getElementById('loginModal').classList.add('active');
+  document.getElementById('loginError').textContent = '';
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginName').style.display = 'block';
+  document.getElementById('loginCode').value = '';
+  setTimeout(() => document.getElementById('loginName').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('loginModal').classList.remove('active');
+  document.getElementById('loginName').style.display = 'block';
+}
+
+async function handleLogin() {
+  const name = document.getElementById('loginName').value.trim();
+  const code = document.getElementById('loginCode').value;
+  const errorEl = document.getElementById('loginError');
+  const btn = document.getElementById('loginBtn');
+
+  if (!name || !code) {
+    errorEl.textContent = 'Please enter your name and code.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '...';
+  errorEl.textContent = '';
+
+  const result = await savoyLogin(name, code);
+
+  btn.disabled = false;
+  btn.textContent = 'Enter';
+
+  if (result.success) {
+    closeModal();
+  } else {
+    errorEl.textContent = result.error;
+  }
+}
+
+async function handleLogout() {
+  await savoyLogout();
+}
+
+document.getElementById('loginCode').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') handleLogin();
+});
+document.getElementById('loginName').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('loginCode').focus();
+});
+document.getElementById('loginModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('loginModal')) closeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+</script>
+</body>
+</html>
