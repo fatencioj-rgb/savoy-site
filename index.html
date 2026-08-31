@@ -10,21 +10,20 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --green: #6e2b3d;
-  --green-dark: #4a1c29;
+  --burgundy: #4a1c29;
+  --burgundy-mid: #6e2b3d;
   --gold: #a8935f;
-  --gold-light: #c9b384;
-  --cream: #f7ede9;
-  --pink: #e3c9c2;
+  --pink-bg: #e6cfc9;
+  --pink-card: #f0ddd8;
   --white: #ffffff;
-  --text: #3a2a2a;
+  --text: #4a1c29;
   --serif: 'Cormorant Garamond', 'Georgia', serif;
   --sans: 'Inter', 'Segoe UI', sans-serif;
 }
 
 body {
   font-family: var(--sans);
-  background: var(--green-dark);
+  background: var(--pink-bg);
   color: var(--text);
   min-height: 100vh;
   display: flex;
@@ -41,26 +40,26 @@ body {
   font-family: var(--serif);
   font-size: 48px;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--burgundy);
   letter-spacing: 6px;
   text-transform: uppercase;
 }
 .logo-sub {
   font-family: var(--sans);
   font-size: 11px;
-  font-weight: 300;
-  color: var(--gold-light);
+  font-weight: 400;
+  color: var(--gold);
   letter-spacing: 5px;
   text-transform: uppercase;
   margin-top: 4px;
-  opacity: 0.75;
+  opacity: 0.9;
 }
 
 .subtitle {
   font-family: var(--sans);
   font-size: 13px;
-  font-weight: 300;
-  color: var(--gold-light);
+  font-weight: 400;
+  color: var(--burgundy-mid);
   letter-spacing: 3px;
   text-transform: uppercase;
   margin-bottom: 50px;
@@ -69,9 +68,9 @@ body {
 
 .divider {
   width: 60px; height: 1px;
-  background: var(--gold);
+  background: var(--burgundy-mid);
   margin: 0 auto 40px;
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .nav-buttons { display: flex; flex-direction: column; gap: 14px; }
@@ -79,13 +78,13 @@ body {
 .nav-btn {
   display: block; width: 100%;
   padding: 16px 24px;
-  background: transparent;
-  border: 1px solid rgba(184, 150, 80, 0.3);
+  background: var(--pink-card);
+  border: 1px solid rgba(74, 28, 41, 0.25);
   border-radius: 6px;
-  color: var(--cream);
+  color: var(--burgundy);
   font-family: var(--sans);
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   text-decoration: none;
@@ -94,27 +93,57 @@ body {
 }
 
 .nav-btn:hover {
-  background: rgba(184, 150, 80, 0.1);
-  border-color: var(--gold);
-  color: var(--gold);
+  background: var(--burgundy);
+  border-color: var(--burgundy);
+  color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(184, 150, 80, 0.15);
+  box-shadow: 0 4px 20px rgba(74, 28, 41, 0.2);
 }
 
 .nav-btn:active { transform: translateY(0); }
 
+/* Login cards — names only, no initials */
+.login-card {
+  cursor: pointer;
+  padding: 16px 32px;
+  min-width: 120px;
+  background: var(--pink-card);
+  border: 1px solid rgba(74, 28, 41, 0.25);
+  border-radius: 8px;
+  color: var(--burgundy);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+.login-card:hover {
+  background: var(--burgundy);
+  border-color: var(--burgundy);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(74, 28, 41, 0.2);
+}
+.login-card-sm {
+  padding: 11px 28px;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
 .user-status {
   margin-bottom: 30px;
   font-size: 12px;
-  color: var(--gold-light);
-  opacity: 0.8;
+  color: var(--burgundy-mid);
+  opacity: 0.85;
   display: none;
 }
 
-.user-status span { font-weight: 500; }
+.user-status span { font-weight: 600; }
 
 .user-status a {
-  color: var(--gold-light);
+  color: var(--burgundy-mid);
   margin-left: 12px;
   opacity: 0.7;
   font-size: 11px;
@@ -140,7 +169,7 @@ body {
 .modal-overlay.active { opacity: 1; visibility: visible; }
 
 .modal-box {
-  background: var(--cream);
+  background: #fdf7f5;
   border-radius: 12px;
   padding: 40px;
   text-align: center;
@@ -148,7 +177,7 @@ body {
   max-width: 380px;
   width: 90%;
   box-shadow: 0 12px 60px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--gold-light);
+  border: 1px solid var(--gold);
   transform: translateY(20px);
   transition: transform 0.3s ease;
 }
@@ -158,7 +187,7 @@ body {
 .modal-title {
   font-family: var(--serif);
   font-size: 24px;
-  color: var(--green);
+  color: var(--burgundy);
   margin-bottom: 24px;
 }
 
@@ -176,7 +205,7 @@ body {
   transition: border-color 0.2s;
 }
 
-.modal-input:focus { border-color: var(--green); }
+.modal-input:focus { border-color: var(--burgundy); }
 .modal-input::placeholder { color: #aaa; }
 
 .modal-error { color: #c0392b; font-size: 12px; margin-bottom: 12px; min-height: 18px; }
@@ -185,8 +214,8 @@ body {
 
 .btn-primary {
   padding: 11px 32px;
-  background: var(--green);
-  color: var(--cream);
+  background: var(--burgundy);
+  color: #fff;
   border: none;
   border-radius: 6px;
   font-family: var(--sans);
@@ -197,7 +226,7 @@ body {
   transition: background 0.2s;
 }
 
-.btn-primary:hover { background: var(--green-dark); }
+.btn-primary:hover { background: var(--burgundy-mid); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-secondary {
@@ -216,7 +245,7 @@ body {
 
 .btn-secondary:hover { border-color: #aaa; color: #555; }
 
-.footer { margin-top: 60px; font-size: 10px; color: rgba(184, 150, 80, 0.4); letter-spacing: 1px; }
+.footer { margin-top: 60px; font-size: 10px; color: rgba(74, 28, 41, 0.5); letter-spacing: 1px; }
 
 @media (max-width: 600px) {
   .logo h1 { font-size: 38px; }
@@ -248,19 +277,13 @@ body {
   </nav>
 
   <div id="loginPrompt" style="display:none;">
-    <p style="color:var(--gold-light);font-size:13px;margin-bottom:24px;opacity:0.8;">Sign in to access the site</p>
+    <p style="color:var(--burgundy-mid);font-size:13px;margin-bottom:24px;opacity:0.85;">Sign in to access the site</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <div onclick="quickLogin('fiorella')" style="cursor:pointer;padding:20px 24px;background:transparent;border:1px solid rgba(168,147,95,0.35);border-radius:10px;text-align:center;transition:all .2s;min-width:90px">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;font-weight:600">F</div>
-        <div style="color:var(--gold-light);font-size:11px;letter-spacing:.5px;font-weight:500">Fiorella</div>
-      </div>
-      <div onclick="quickLogin('katerin')" style="cursor:pointer;padding:20px 24px;background:transparent;border:1px solid rgba(168,147,95,0.35);border-radius:10px;text-align:center;transition:all .2s;min-width:90px">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;font-weight:600">K</div>
-        <div style="color:var(--gold-light);font-size:11px;letter-spacing:.5px;font-weight:500">Katerin</div>
-      </div>
+      <div class="login-card" onclick="quickLogin('fiorella')">Fiorella</div>
+      <div class="login-card" onclick="quickLogin('katerin')">Katerin</div>
     </div>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px">
-      <div onclick="quickLogin('guest')" style="cursor:pointer;display:inline-block;padding:10px 24px;border:1px solid rgba(184,150,80,0.3);border-radius:6px;color:var(--gold-light);font-size:12px;letter-spacing:1px;text-transform:uppercase;transition:all .2s">Guest</div>
+      <div class="login-card login-card-sm" onclick="quickLogin('guest')">Guest</div>
     </div>
   </div>
 
