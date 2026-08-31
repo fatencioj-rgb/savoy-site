@@ -1,6 +1,13 @@
-# Savoy — Front of House
+# Savoy Grill — Front of House
 
-Internal FOH site for Savoy, based on the Petrus site. This is a new, standalone repo.
+Internal FOH site for Savoy Grill (Gordon Ramsay), based on the Petrus site.
+This is a new, standalone repo with its own Firebase project.
+
+## Users
+
+- **Fiorella** — admin (`fiorella@savoy.local`)
+- **Katerin** — full sommelier access (`katerin@savoy.local`)
+- Everyone else logs in as **Guest** (`guest@savoy.local`), Training only.
 
 ## Structure
 
@@ -43,9 +50,10 @@ Setup:
 1. Go to https://console.firebase.google.com and create a project, e.g. `savoy-foh`.
 2. **Build > Authentication > Get started > Email/Password > Enable**.
 3. **Build > Firestore Database > Create database**.
-4. **Authentication > Users > Add user** — create logins like
-   `fiorella@savoy.local`, `christian@savoy.local`, `milena@savoy.local`,
-   `guest@savoy.local`. The password is the person's "personal code".
+4. **Authentication > Users > Add user** — create logins:
+   `fiorella@savoy.local` (admin), `katerin@savoy.local`, and
+   `guest@savoy.local` for everyone else. The password is the person's
+   "personal code".
 5. **Project Settings (gear) > Your apps > Web app (</>)** — copy the
    `firebaseConfig` object and paste it into `auth.js` (replace every
    `REPLACE_ME`).

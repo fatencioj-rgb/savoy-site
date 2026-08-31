@@ -10,13 +10,14 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --green: #14304f;
-  --green-dark: #0a1a2e;
-  --gold: #b89650;
-  --gold-light: #d4b87a;
-  --cream: #faf7f1;
+  --green: #6e2b3d;
+  --green-dark: #4a1c29;
+  --gold: #a8935f;
+  --gold-light: #c9b384;
+  --cream: #f7ede9;
+  --pink: #e3c9c2;
   --white: #ffffff;
-  --text: #2c2c2c;
+  --text: #3a2a2a;
   --serif: 'Cormorant Garamond', 'Georgia', serif;
   --sans: 'Inter', 'Segoe UI', sans-serif;
 }
@@ -38,11 +39,21 @@ body {
 .logo { margin-bottom: 8px; }
 .logo h1 {
   font-family: var(--serif);
-  font-size: 52px;
-  font-weight: 700;
+  font-size: 48px;
+  font-weight: 600;
   color: var(--gold);
-  letter-spacing: 4px;
+  letter-spacing: 6px;
   text-transform: uppercase;
+}
+.logo-sub {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 300;
+  color: var(--gold-light);
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  margin-top: 4px;
+  opacity: 0.75;
 }
 
 .subtitle {
@@ -219,7 +230,8 @@ body {
 
 <div class="container">
   <div class="logo">
-    <h1>Savoy</h1>
+    <h1>Savoy Grill</h1>
+    <p class="logo-sub">Gordon Ramsay</p>
   </div>
   <p class="subtitle">Front of House</p>
 
@@ -238,17 +250,13 @@ body {
   <div id="loginPrompt" style="display:none;">
     <p style="color:var(--gold-light);font-size:13px;margin-bottom:24px;opacity:0.8;">Sign in to access the site</p>
     <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
-      <div onclick="quickLogin('fiorella')" style="cursor:pointer;padding:20px 24px;background:transparent;border:1px solid rgba(184,150,80,0.3);border-radius:10px;text-align:center;transition:all .2s;min-width:90px">
+      <div onclick="quickLogin('fiorella')" style="cursor:pointer;padding:20px 24px;background:transparent;border:1px solid rgba(168,147,95,0.35);border-radius:10px;text-align:center;transition:all .2s;min-width:90px">
         <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;font-weight:600">F</div>
         <div style="color:var(--gold-light);font-size:11px;letter-spacing:.5px;font-weight:500">Fiorella</div>
       </div>
-      <div onclick="quickLogin('christian')" style="cursor:pointer;padding:20px 24px;background:transparent;border:1px solid rgba(184,150,80,0.3);border-radius:10px;text-align:center;transition:all .2s;min-width:90px">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;font-weight:600">C</div>
-        <div style="color:var(--gold-light);font-size:11px;letter-spacing:.5px;font-weight:500">Christian</div>
-      </div>
-      <div onclick="quickLogin('milena')" style="cursor:pointer;padding:20px 24px;background:transparent;border:1px solid rgba(184,150,80,0.3);border-radius:10px;text-align:center;transition:all .2s;min-width:90px">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;font-weight:600">M</div>
-        <div style="color:var(--gold-light);font-size:11px;letter-spacing:.5px;font-weight:500">Milena</div>
+      <div onclick="quickLogin('katerin')" style="cursor:pointer;padding:20px 24px;background:transparent;border:1px solid rgba(168,147,95,0.35);border-radius:10px;text-align:center;transition:all .2s;min-width:90px">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--green-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:14px;font-weight:600">K</div>
+        <div style="color:var(--gold-light);font-size:11px;letter-spacing:.5px;font-weight:500">Katerin</div>
       </div>
     </div>
     <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px">
@@ -291,7 +299,7 @@ auth.onAuthStateChanged((user) => {
     logAccess(user, 'page_view', 'index.html');
 
     var isGuest = user.email && user.email.startsWith('guest');
-    var sommAllowed = ['christian@savoy.local','milena@savoy.local','fiorella@savoy.local'];
+    var sommAllowed = ['fiorella@savoy.local','katerin@savoy.local'];
     var isSomm = sommAllowed.indexOf(user.email) >= 0;
     if (isGuest) {
       nav.style.display = 'flex';

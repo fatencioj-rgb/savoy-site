@@ -22,7 +22,7 @@ const db = firebase.firestore();
   var page = window.location.pathname.split('/').pop() || 'index.html';
   var guestAllowed = ['training.html', 'winelist.html', 'index.html'];
   var sommPages = ['sommeliers.html','somm-stocktake.html'];
-  var sommAllowed = ['christian@savoy.local','milena@savoy.local','fiorella@savoy.local'];
+  var sommAllowed = ['fiorella@savoy.local','katerin@savoy.local'];
   if (guestAllowed.indexOf(page) < 0) {
     auth.onAuthStateChanged(function(user) {
       if (!user) return;
