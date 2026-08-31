@@ -1,24 +1,15 @@
 // ═══════════════════════════════════════════════════════════════════
 // Savoy FOH — Firebase Auth & Access Logging
 // ═══════════════════════════════════════════════════════════════════
-// SAVOY has its OWN Firebase project, separate from Petrus.
-//
-// TODO — Paste the Savoy Firebase web config below:
-//   1. https://console.firebase.google.com  → create project "savoy-foh"
-//   2. Build > Authentication > enable Email/Password
-//   3. Build > Firestore Database > create database
-//   4. Project Settings (gear) > Your apps > Web app (</>) > copy config
-//   5. Replace every REPLACE_ME value below with the copied values.
-//
-// Until this is done with a REAL Savoy project, login will NOT work.
+// SAVOY has its OWN Firebase project (savoy-grill), separate from Petrus.
 
 const firebaseConfig = {
-  apiKey: "REPLACE_ME",
-  authDomain: "savoy-foh.firebaseapp.com",
-  projectId: "savoy-foh",
-  storageBucket: "savoy-foh.firebasestorage.app",
-  messagingSenderId: "REPLACE_ME",
-  appId: "REPLACE_ME"
+  apiKey: "AIzaSyAWWx9L1d-rpctE3NhdBkMxtwUatGUpGkQ",
+  authDomain: "savoy-grill.firebaseapp.com",
+  projectId: "savoy-grill",
+  storageBucket: "savoy-grill.firebasestorage.app",
+  messagingSenderId: "778701596304",
+  appId: "1:778701596304:web:8248040db23b30048f1a15"
 };
 
 // Initialize Firebase
